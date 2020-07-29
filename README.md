@@ -7,11 +7,15 @@ In the following folder you will find all the files needed to use the tableau-pr
 
 To prove one of the axioms or rules with the prover download the content in one directory, and run the following command from within this directory in the terminal:
 
+```bash
  java -jar BISKT.jar -i axioms/<problem> -t Tableau_2
+```
 
 To prove one of the propositions with the prover run the following command from within this directory in the terminal:
    
+```bash
  java -jar BISKT.jar -i propositions/<problem> -t Tableau_2
+```
 
 
 When for an input problem of the form @i F(P) for some formula P the result given by the prover is `unsatisfiable’, that means that P is a theorem in the logic UBiSKt. 
