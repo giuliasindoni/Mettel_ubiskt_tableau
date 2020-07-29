@@ -1,0 +1,197 @@
+   // closure rules
+ //  @i(T P)  @i(F P) 
+   //    /  
+     //                                priority 0 $;
+   
+ //  H(i, j) @m(P) @m(T Q) @m(F Q)
+   //      /                           priority 0 $; 
+
+
+    @m(P) @m(T Q) @m(F Q)
+        /                           
+                                        priority 0 $; 
+
+
+   // rule for false
+   @i(T false) 
+       / 
+                                     priority 0 $;
+
+   // or rules
+   @i(T(P|Q)) 
+       / @i(T P) $| @i(T Q) 
+                                     priority 7 $;
+   @i(F(P|Q)) 
+       / @i(F P)  @i(F Q) 
+                                     priority 1 $;
+
+   // and rules
+   @i(T(P&Q)) 
+       / @i(T P)  @i(T Q) 
+                                     priority 1 $;
+   @i(F(P&Q)) 
+       / @i(F P) $| @i(F Q) 
+                                     priority 7 $;
+
+   // rules for intuitionistic negation
+   @i(T(-P))  H(i,j) 
+       / @j(F P) 
+                                     priority 2 $;
+   @i(F(-P)) 
+       / H(i,fn(i,P))  @fn(i,P)(T P) 
+                                     priority 10 $;
+
+   // dual negation
+   //
+   //   ~alpha  =  (alpha') + H  
+   //   u \in ~alpha      iff  \exists x . not(x \in alpha) and (x,u) \in H
+   //   not u \in ~alpha  iff  \forall x . x \in alpha or not (x,u) \in H
+   //                     iff  \forall x . (x,u) \in H implies x \in alpha
+   //
+   @i(T(~P)) 
+       / H(fDn(i,P),i)  @fDn(i,P)(F P) 
+                                     priority 10 $;
+   @i(F(~P))  H(j,i) 
+       / @j(T P) 
+                                     priority 2 $;
+
+   // rules for intuitionistic implication
+   @i(T(P->Q))  H(i,j) 
+       / @j(F P) $| @j(T Q) 
+                                     priority 2 $;
+   @i(F(P->Q)) 
+       / H(i,fi(i,P,Q))  @fi(i,P,Q)(T P)  @fi(i,P,Q)(F Q) 
+                                     priority 10 $;
+
+   // rules for dual implication
+   @i(T(P>-Q)) 
+       / H(fDi(i,P,Q),i)  @fDi(i,P,Q)(T P)  @fDi(i,P,Q)(F Q) 
+                                     priority 10 $;
+   @i(F(P>-Q))  H(j,i) 
+       / @j(F P) $| @j(T Q) 
+                                     priority 2 $;
+
+   // box operator (white box)
+   @i(T([]P))  R(i,j) 
+       / @j(T P) 
+                                     priority 2 $;
+   @i(F([]P)) 
+       / R(i,fwb(i,P))  @fwb(i,P)(F P) 
+                                     priority 10 $;
+
+   // left white diamond operator
+   //
+   //   <l>alpha = alpha + (H;R^;H)
+   //                (H;R^;H) = left converse of R
+   //   + is dilation operator or image of alpha under (H;R^;H)
+   //   u \in X + A    iff  \exists x \in X such that (x,u) \in A
+   //   u \in <l>alpha  iff  \exists x \in alpha such that (x,u) \in (H;R^;H)
+   //                  iff  \exists x \in alpha such that (u,x) \in (H^;R;H^)
+   //   not u \in <l>alpha  iff  \forall x ((x,u) \in (H;R^;H) implies not x \in alpha)
+   //                    iff  \forall x ((u,x) \in (H^;R;H^) implies not x \in alpha)
+   //
+   @i(T(<l>P))
+       / H(lg1(i,P),i)  R(lg1(i,P),lg2(i,P))  H(flwd(i,P),lg2(i,P))  @flwd(i,P)(T P)
+                                     priority 10 $;
+   @i(F(<l>P))  H(j,i)  R(j,k)  H(m,k)
+       / @m(F P)
+                                     priority 4 $;
+
+   // black diamond operator
+   //
+   //   backward looking diamond; adjoint of []
+   //   <<>>alpha =  alpha + R 
+   //   u \in X + A          iff  \exists x \in X such that (x,u) \in A
+   //   u \in <<>>alpha      iff  \exists x \in alpha such that (x,u) \in R
+   //   not u \in <<>>alpha  iff  \exists x (x,u) \in R and x \in alpha
+   //
+   @i(T(<<>>P)) 
+       / R(fbd(i,P),i)  @fbd(i,P)(T P) 
+                                     priority 10 $;
+   @i(F(<<>>P))  R(j,i) 
+       / @j (F P) 
+                                     priority 2 $;
+
+   // left black box operator
+   //
+   //   [[l]]alpha = (H;R^;H) - alpha
+   //                (H;R^;H) = left converse of R
+   //   u in A - X           iff  \forall v . (u,v) \in A implies v \in X
+   //   u \in [[l]]alpha      iff  \forall v . (u,v) \in (H;R^;H) implies v \in alpha
+   //   not u \in [[l]]alpha  iff  \exists v . (u,v) \in (H;R^;H) and not v \in alpha
+   //
+   @i(T([[l]]P))  H(i,j)  R(k,j)  H(k,m)
+       / @m (T P) 
+                                     priority 4 $;
+   @i(F([[l]]P)) 
+       / H(i,lh1(i,P))  R(lh2(i,P),lh1(i,P))  H(lh2(i,P),flbb(i,P))  @flbb(i,P)(F P) 
+                                     priority 10 $;
+
+    // universal box operator
+    @i(T([u]P)) @j(Q)
+        / @j(T P)
+                                     priority 2 $;
+
+
+     @i(F([u]P))
+        / @fub(i,P)(F P)
+                                        priority 10 $;
+
+
+     // universal diamond operator 
+     @i(T(<u>P)) 
+     / @fud(i,P)(T P)
+                                        priority 10 $;
+
+     @i(F(<u> P)) @j(Q)
+        / @j(F P)
+                                         priority 2 $;
+
+
+    // U is universal
+   // @i P   @j Q
+    // / U(i,j)
+      //                             priority 1 $;
+
+   // H is a preorder
+   // reflexivity
+   @i P 
+       / H(i,i) 
+                                     priority 3 $;
+   // transitivity
+   H(i,j)  H(j,k) 
+       / H(i,k) 
+                                     priority 2 $;
+
+   // sets form downsets
+   @i(T P)  H(i,j) 
+       / @j(T P) 
+                                     priority 2 $;
+
+   // R satisfies: H;R;H subset R
+   H(i,j1)  R(j1,j2)  H(j2,k) 
+       / R(i,k) 
+                                     priority 4 $;
+
+   // for blocking
+   H(i,j) 
+       / [i=j] $| (not([i=j])) 
+                                     priority 9 $;
+    R(i,j) 
+        / [i=j] $| (not([i=j])) 
+                                    priority 9 $;
+
+    // for blocking
+ //  U(i,j) 
+   //    / [i=j] $| (not([i=j])) 
+     //                                priority 9 $;
+
+   // ub rule
+  //  @i P  @j Q
+    //    / [i=j] $| (not([i=j])) 
+      //                                priority 9 $;
+
+   // property of equality
+   not([i=i])
+       / 
+                                     priority 0 $;
