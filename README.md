@@ -3,7 +3,8 @@ This tableau-style theorem-prover for the logic UBiSKt has been generated using 
 
 In order to use the tableau-prover you will need Java Runtime Environment, Version 1.6.0 or later. 
 
-In the following folder you will find all the files needed to use the tableau-prover, a file called Tableau_2 where the tableau rules for UBiSKt are specified, a folder called axioms with all the axioms and rules of HUBiSKt, and a folder called propositions with all the propositions of section 3.3 of the paper Axiomatizing Discrete Spatial Relations, G. Sindoni, K. Sano and J. G. Stell. 
+In the following repository you will find all the files needed to use the tableau-prover, a file called Tableau_2 where the tableau rules for UBiSKt are specified, a folder called axioms with all the axioms and rules of HUBiSKt, and a folder called propositions with all the propositions of Section 3.4 of the thesis "Graph Granularity through Bi-intuitionistic Modal Logic" by G. Sindoni, (2020).
+This implementation has also been published in the paper "Axiomatizing Discrete Spatial Relations", by G. Sindoni, K. Sano and J. G. Stell (2018).
 
 To prove one of the axioms or rules with the prover download the content in one directory, and run the following command from within this directory in the terminal:
 
